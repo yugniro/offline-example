@@ -13,7 +13,7 @@
   </div>
     <script>
       if('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/offline-worker.js', { scope: '/' })
+        navigator.serviceWorker.register('./offline-worker.js', { scope: '/' })
           .then(function(registration) {
                 console.log('Service Worker for Offline is registered');
           });
