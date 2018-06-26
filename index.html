@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset='utf-8'>
+    <title>Test offline application</title>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+  </head>
+  <body>
+  <div><a href="./page2.html">Перейти на страницу №2</a></div>
+  <div>
+  <p>Это демо-страничка показывающая, как работает веб-сайт в режиме offline. Отключите интернет и пользуйтесь сайтом дальше.</p>
+  <p>Пример ввода данных и сохранения в локальную БД</p>
+  <form id="mainForm">
+  <table>
+    <tr>
+    <td>Length
+    <td>Age</td>
+    <td>Sex</td>
+    <td>Weight</td>
+    </tr>
+    <tr>
+    <td><input name="length" type="text" /></td>
+    <td><input name="age" type="text" /></td>
+    <td><input name="sex" type="text" /></td>
+    <td><input name="weight" type="text" /></td>
+    </tr>
+    <tr>
+    <td><input name="length" type="text" /></td>
+    <td><input name="age" type="text" /></td>
+    <td><input name="sex" type="text" /></td>
+    <td><input name="weight" type="text" /></td>
+    </tr>
+    <tr>
+    <td><input name="length" type="text" /></td>
+    <td><input name="age" type="text" /></td>
+    <td><input name="sex" type="text" /></td>
+    <td><input name="weight" type="text" /></td>
+    </tr>
+    <tr>
+    <td><input name="length" type="text" /></td>
+    <td><input name="age" type="text" /></td>
+    <td><input name="sex" type="text" /></td>
+    <td><input name="weight" type="text" /></td>
+    </tr>
+  </table>
+  <label for="dataName">Название хранилища: </label> <input id="dataName" value="my_storage" />
+  <button id="save" type="button">Схоронить в browserStorage</button>
+  <button id="isOn" type="button">isOnline?</button>
+  </form>
+  
+  <p>Ранее сохраненные данные: </p>
+  <ul id="dataList">
+  
+  </ul>
+  
+  <p id="localValue"></p>
+  </div>
+  <script src="js/jquery.min.js"></script>
+    <script>
+      if('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/offline-worker.js', { scope: '/' })
+          .then(function(registration) {
+                console.log('Service Worker for Offline is registered');
+          });
+
+        navigator.serviceWorker.ready.then(function(registration) {
+           console.log('Service Worker Ready');
+        });
+      }
+      
+      
+      for (var it in localStorage) {
+        if (it.startsWith('data_')) {
+            console.log("Found local storage by key: " + it);
+        }
+      }
+      
+      // example of usage localDatastore
+      var lsVal = localStorage.getItem("data_test1");
+      if (lsVal) {
+        console.log("Get var from localStorage: " + lsVal);
+        document.getElementById('localValue').innerHTML = lsVal;
+      } else {
+        console.log("Local storage is empty. Set var data_test1");
+        localStorage.setItem("data_test1", "Some heavy string value for permament store var data_test1");
+      }
+      
+      $(document).ready(function(){
+        $('#dataName').val('fish_idx_' + Math.floor(Math.random() * 100) + 1);
+          // extended example with table
+          $('#save').on('click', function(){
+            var arrayData = $('#mainForm').serializeArray();
+            var json = JSON.stringify(arrayData);
+            var keyName = 'data_' + $('#dataName').val();
+            localStorage.setItem(keyName, json);
+            alert('Данные успешно схоронены в локальное хранилище браузера');
+            $('#mainForm').find('input[type=text]').val("");
+            $('#dataName').val('fish_idx_' + Math.floor(Math.random() * 100) + 1);
+          });
+          // list exist data
+          for (var stor in localStorage) {
+            if (stor.startsWith('data_')) {
+                $('#dataList').append('<li><a href="javascript:void(0);" id="' + stor + '" class="click_data">' + stor + '</a></li>');
+            }
+          }
+          
+          // event onclick for dynamic local data
+          $('html').on('click', '.click_data', function(){
+            var sName = $(this).attr('id');
+            var sVal = localStorage.getItem(sName);
+            alert(sVal);
+          });
+          
+          $('#isOn').on('click', function(){
+            $.getJSON('test.json', function(){
+                alert('online');
+            })
+            .fail(function(){
+                alert('Offline');
+            })
+          });
+      });
+    </script>
+  </body>
+</html>
